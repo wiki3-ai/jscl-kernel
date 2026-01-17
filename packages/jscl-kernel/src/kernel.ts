@@ -20,7 +20,8 @@ export class JSCLKernel extends BaseKernel implements IKernel {
   constructor(options: JSCLKernel.IOptions) {
     super(options);
     this._worker = this.initWorker(options);
-    this._worker.onmessage = (e: MessageEvent) => this._processWorkerMessage(e.data);
+    this._worker.onmessage = (e: MessageEvent) =>
+      this._processWorkerMessage(e.data);
     this.remoteKernel = this.initRemote(options);
     this._ready.resolve();
   }
@@ -175,10 +176,9 @@ export class JSCLKernel extends BaseKernel implements IKernel {
    */
   protected initWorker(options: JSCLKernel.IOptions): Worker {
     // Create the worker using the comlink worker
-    const worker = new Worker(
-      new URL('./comlink.worker', import.meta.url),
-      { type: 'module' }
-    );
+    const worker = new Worker(new URL('./comlink.worker', import.meta.url), {
+      type: 'module'
+    });
     return worker;
   }
 

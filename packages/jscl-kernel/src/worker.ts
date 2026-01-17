@@ -106,7 +106,7 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
       const name = error.name || 'Error';
       const message = error.message || String(error);
       const stack = error.stack || '';
-      
+
       const bundle = {
         ename: name,
         evalue: message,
@@ -138,7 +138,7 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
     // Basic completion - list all symbols in the global namespace
     const { code, cursor_pos } = content;
     const matches: string[] = [];
-    
+
     // Get text before cursor
     const textBeforeCursor = code.slice(0, cursor_pos);
     const tokens = textBeforeCursor.split(/[\s()]+/);
@@ -147,13 +147,43 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
     // Get Common Lisp symbols (basic implementation)
     // In a real implementation, you would query JSCL for available symbols
     const commonLispSymbols = [
-      'defun', 'defvar', 'defparameter', 'defmacro', 'defclass',
-      'let', 'let*', 'lambda', 'if', 'when', 'unless', 'cond',
-      'loop', 'do', 'dolist', 'dotimes',
-      'car', 'cdr', 'cons', 'list', 'append', 'reverse',
-      'print', 'princ', 'format',
-      '+', '-', '*', '/', '=', '<', '>', '<=', '>=',
-      'and', 'or', 'not'
+      'defun',
+      'defvar',
+      'defparameter',
+      'defmacro',
+      'defclass',
+      'let',
+      'let*',
+      'lambda',
+      'if',
+      'when',
+      'unless',
+      'cond',
+      'loop',
+      'do',
+      'dolist',
+      'dotimes',
+      'car',
+      'cdr',
+      'cons',
+      'list',
+      'append',
+      'reverse',
+      'print',
+      'princ',
+      'format',
+      '+',
+      '-',
+      '*',
+      '/',
+      '=',
+      '<',
+      '>',
+      '<=',
+      '>=',
+      'and',
+      'or',
+      'not'
     ];
 
     for (const symbol of commonLispSymbols) {
@@ -194,7 +224,7 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
     parent: any
   ): Promise<KernelMessage.IIsCompleteReplyMsg['content']> {
     const { code } = content;
-    
+
     // Simple check for balanced parentheses
     let depth = 0;
     for (const char of code) {
@@ -222,7 +252,7 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
     if (result === null || result === undefined) {
       return String(result);
     }
-    
+
     // JSCL returns JavaScript values
     if (typeof result === 'string') {
       return result;
