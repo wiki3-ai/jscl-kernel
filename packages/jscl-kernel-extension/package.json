@@ -1,0 +1,52 @@
+{
+  "name": "@jupyterlite/jscl-kernel-extension",
+  "version": "0.1.0",
+  "description": "JupyterLite - Common Lisp Kernel Extension",
+  "homepage": "https://github.com/wiki3-ai/jscl-kernel",
+  "bugs": {
+    "url": "https://github.com/wiki3-ai/jscl-kernel/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wiki3-ai/jscl-kernel.git"
+  },
+  "license": "BSD-3-Clause",
+  "author": "JSCL Kernel Contributors",
+  "sideEffects": [
+    "style/**/*.css",
+    "style/index.js"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "style": "style/index.css",
+  "directories": {
+    "lib": "lib/"
+  },
+  "files": [
+    "lib/**/*.{d.ts,js,js.map}",
+    "style/**/*.{css,js,png,svg}",
+    "src/**/*.{ts,tsx}"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "build:prod": "tsc -b",
+    "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
+    "prepublishOnly": "npm run build",
+    "watch": "tsc -b --watch"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "^4.0.0",
+    "@jupyterlite/jscl-kernel": "^0.1.0",
+    "@jupyterlite/services": "^0.7.0"
+  },
+  "devDependencies": {
+    "rimraf": "~5.0.1",
+    "typescript": "~5.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "jupyterlab": {
+    "extension": true
+  }
+}

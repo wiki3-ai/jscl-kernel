@@ -1,0 +1,82 @@
+[build-system]
+requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0.3.2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jupyterlite-jscl-kernel"
+version = "0.1.0"
+description = "A Common Lisp kernel for JupyterLite using JSCL"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "JSCL Kernel Contributors" },
+]
+keywords = ["jupyter", "jupyterlab", "jupyterlab-extension", "jupyterlite", "common-lisp", "jscl"]
+classifiers = [
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "jupyterlite-core>=0.3.0,<1.0.0",
+]
+
+[project.license]
+file = "LICENSE"
+
+[project.urls]
+Homepage = "https://github.com/wiki3-ai/jscl-kernel"
+Source = "https://github.com/wiki3-ai/jscl-kernel"
+Tracker = "https://github.com/wiki3-ai/jscl-kernel/issues"
+
+[project.optional-dependencies]
+dev = [
+    "jupyter-packaging",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+kernels = [
+    "jscl-kernel @ file:./jupyterlite_jscl_kernel",
+]
+
+[tool.hatch.build]
+artifacts = [
+    "jupyterlite_jscl_kernel/labextension",
+]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"jupyterlite_jscl_kernel/labextension" = "share/jupyter/labextensions/@jupyterlite/jscl-kernel-extension"
+"install.json" = "share/jupyter/labextensions/@jupyterlite/jscl-kernel-extension/install.json"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    ".github",
+    "node_modules",
+]
+
+[tool.hatch.build.hooks.jupyter-builder]
+dependencies = ["hatch-jupyter-builder>=0.5"]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = [
+    "jupyterlite_jscl_kernel/labextension/static/style.js",
+    "jupyterlite_jscl_kernel/labextension/package.json",
+]
+skip-if-exists = ["jupyterlite_jscl_kernel/labextension/static/style.js"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+build_cmd = "build:prod"
+npm = ["jlpm"]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+build_cmd = "build:prod"
+npm = ["jlpm"]
+source_dir = "packages/jscl-kernel-extension"
+build_dir = "jupyterlite_jscl_kernel/labextension"

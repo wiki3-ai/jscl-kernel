@@ -1,0 +1,56 @@
+{
+  "name": "@jupyterlite/jscl-kernel-root",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A Common Lisp kernel for JupyterLite using JSCL",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension",
+    "common-lisp",
+    "jscl"
+  ],
+  "homepage": "https://github.com/wiki3-ai/jscl-kernel",
+  "bugs": {
+    "url": "https://github.com/wiki3-ai/jscl-kernel/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": "JSCL Kernel Contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wiki3-ai/jscl-kernel.git"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "scripts": {
+    "build": "lerna run build",
+    "build:prod": "lerna run build:prod",
+    "clean": "lerna run clean",
+    "clean:all": "lerna run clean && rimraf node_modules",
+    "install:extension": "jupyter labextension develop --overwrite .",
+    "eslint": "eslint . --ext .ts,.tsx --fix",
+    "eslint:check": "eslint . --ext .ts,.tsx",
+    "lint": "yarn run eslint && yarn run prettier",
+    "lint:check": "yarn run eslint:check && yarn run prettier:check",
+    "prettier": "prettier --write \"**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}\"",
+    "prettier:check": "prettier --list-different \"**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}\"",
+    "watch": "lerna run watch"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "lerna": "^8.0.0",
+    "prettier": "^3.0.0",
+    "rimraf": "^5.0.1",
+    "typescript": "~5.0.2",
+    "typescript-eslint": "^8.0.0"
+  }
+}

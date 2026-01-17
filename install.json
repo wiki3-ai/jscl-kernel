@@ -1,0 +1,7 @@
+{
+  "PackageManager": "python-package",
+  "PackageFormat": "tar.gz",
+  "PackageName": "@jupyterlite/jscl-kernel-extension",
+  "BaseURL": "https://pypi.org/pypi",
+  "LabExtensionPath": "jupyterlite_jscl_kernel/labextension"
+}
