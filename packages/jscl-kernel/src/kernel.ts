@@ -1,4 +1,3 @@
-import { PageConfig } from '@jupyterlab/coreutils';
 import type { KernelMessage } from '@jupyterlab/services';
 import { BaseKernel, type IKernel } from '@jupyterlite/services';
 import { PromiseDelegate } from '@lumino/coreutils';
@@ -126,6 +125,52 @@ export class JSCLKernel extends BaseKernel implements IKernel {
   }
 
   /**
+   * Handle an `input_reply` message
+   *
+   * @param content The request content.
+   */
+  async inputReply(
+    content: KernelMessage.IInputReplyMsg['content']
+  ): Promise<void> {
+    // Not implemented
+  }
+
+  /**
+   * Handle a `comm_info_request` message
+   *
+   * @param content The request content.
+   */
+  async commInfoRequest(
+    content: KernelMessage.ICommInfoRequestMsg['content']
+  ): Promise<KernelMessage.ICommInfoReplyMsg['content']> {
+    return {
+      comms: {},
+      status: 'ok'
+    };
+  }
+
+  /**
+   * Handle a `comm_open` message
+   */
+  async commOpen(msg: KernelMessage.ICommOpenMsg): Promise<void> {
+    // Not implemented
+  }
+
+  /**
+   * Handle a `comm_msg` message
+   */
+  async commMsg(msg: KernelMessage.ICommMsgMsg): Promise<void> {
+    // Not implemented
+  }
+
+  /**
+   * Handle a `comm_close` message
+   */
+  async commClose(msg: KernelMessage.ICommCloseMsg): Promise<void> {
+    // Not implemented
+  }
+
+  /**
    * Initialize the worker.
    */
   protected initWorker(options: JSCLKernel.IOptions): Worker {
@@ -156,19 +201,19 @@ export class JSCLKernel extends BaseKernel implements IKernel {
 
     switch (msg.type) {
       case 'stream': {
-        this.stream(msg.bundle, this.parent);
+        this.stream(msg.bundle, this.parent?.header);
         break;
       }
       case 'execute_result': {
-        this.publishExecuteResult(msg.bundle, this.parent);
+        this.publishExecuteResult(msg.bundle, this.parent?.header);
         break;
       }
       case 'execute_error': {
-        this.publishExecuteError(msg.bundle, this.parent);
+        this.publishExecuteError(msg.bundle, this.parent?.header);
         break;
       }
       case 'display_data': {
-        this.displayData(msg.bundle, this.parent);
+        this.displayData(msg.bundle, this.parent?.header);
         break;
       }
       default:

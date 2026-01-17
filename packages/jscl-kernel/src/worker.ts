@@ -47,14 +47,15 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
 
     // Load JSCL
     try {
-      // Import JSCL - it will be available in the worker context
+      // Try to import JSCL from global scope first
       // @ts-expect-error JSCL is loaded globally
       if (typeof self.jscl !== 'undefined') {
         // @ts-expect-error JSCL is loaded globally
         this._jsclEval = self.jscl.evaluateString;
       } else {
         // Try to load JSCL from CDN if not bundled
-        importScripts(
+        // Use type declaration for importScripts in worker context
+        (self as any).importScripts(
           'https://cdn.jsdelivr.net/npm/jscl@0.9.0/jscl.js'
         );
         // @ts-expect-error JSCL is loaded globally
