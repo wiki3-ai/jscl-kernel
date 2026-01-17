@@ -1,7 +1,5 @@
 {
-  "PackageManager": "python-package",
-  "PackageFormat": "tar.gz",
-  "PackageName": "@jupyterlite/jscl-kernel-extension",
-  "BaseURL": "https://pypi.org/pypi",
-  "LabExtensionPath": "jupyterlite_jscl_kernel/labextension"
+  "packageManager": "python",
+  "packageName": "jupyterlite_jscl_kernel",
+  "uninstallInstructions": "Use your Python package manager (pip, conda, etc.) to uninstall the package jupyterlite_javascript_kernel"
 }

@@ -7,7 +7,7 @@ name = "jupyterlite-jscl-kernel"
 version = "0.1.0"
 description = "A Common Lisp kernel for JupyterLite using JSCL"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
     { name = "JSCL Kernel Contributors" },
 ]
@@ -23,9 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
-dependencies = [
-    "jupyterlite-core>=0.3.0,<1.0.0",
-]
+dependencies = [ ]
 
 [project.license]
 file = "LICENSE"
@@ -35,32 +33,26 @@ Homepage = "https://github.com/wiki3-ai/jscl-kernel"
 Source = "https://github.com/wiki3-ai/jscl-kernel"
 Tracker = "https://github.com/wiki3-ai/jscl-kernel/issues"
 
-[project.optional-dependencies]
-dev = [
-    "jupyter-packaging",
-]
+
+[tool.hatch.version]
+source = "nodejs"
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
-kernels = [
-    "jscl-kernel @ file:./jupyterlite_jscl_kernel",
-]
-
-[tool.hatch.build]
-artifacts = [
-    "jupyterlite_jscl_kernel/labextension",
-]
-
-[tool.hatch.build.targets.wheel.shared-data]
-"jupyterlite_jscl_kernel/labextension" = "share/jupyter/labextensions/@jupyterlite/jscl-kernel-extension"
-"install.json" = "share/jupyter/labextensions/@jupyterlite/jscl-kernel-extension/install.json"
+[tool.hatch.metadata.hooks.nodejs]
+fields = ["description", "authors", "urls", "keywords"]
 
 [tool.hatch.build.targets.sdist]
-exclude = [
-    ".github",
-    "node_modules",
-]
+artifacts = ["jupyterlite_jscl_kernel/labextension"]
+exclude = [".github", "binder"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"jupyterlite_jscl_kernel/labextension" = "share/jupyter/labextensions/@jupyterlite/jscl-kernel"
+"install.json" = "share/jupyter/labextensions/@jupyterlite/jscl-kernel/install.json"
+
+[tool.hatch.build.hooks.version]
+path = "jupyterlite_jscl_kernel/_version.py"
 
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
@@ -76,7 +68,7 @@ build_cmd = "build:prod"
 npm = ["jlpm"]
 
 [tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
-build_cmd = "build:prod"
+build_cmd = "install:extension"
 npm = ["jlpm"]
-source_dir = "packages/jscl-kernel-extension"
+source_dir = "src"
 build_dir = "jupyterlite_jscl_kernel/labextension"
