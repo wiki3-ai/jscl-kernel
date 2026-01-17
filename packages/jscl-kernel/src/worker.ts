@@ -42,7 +42,16 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
     console.warn = console.error;
 
     self.onerror = (message, source, lineno, colno, error) => {
-      console.error(message);
+      const errorDetails = [
+        `Error: ${message}`,
+        source ? `Source: ${source}` : '',
+        lineno ? `Line: ${lineno}` : '',
+        colno ? `Column: ${colno}` : '',
+        error ? `Stack: ${error.stack}` : ''
+      ]
+        .filter(Boolean)
+        .join('\n');
+      console.error(errorDetails);
     };
 
     // Load JSCL
@@ -53,7 +62,9 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
         // @ts-expect-error JSCL is loaded globally
         this._jsclEval = self.jscl.evaluateString;
       } else {
-        // Try to load JSCL from CDN if not bundled
+        // Load JSCL from CDN if not bundled
+        // Note: In production, consider bundling JSCL directly or using SRI
+        // for enhanced security. See CONTRIBUTING.md for details.
         // Use type declaration for importScripts in worker context
         (self as any).importScripts(
           'https://cdn.jsdelivr.net/npm/jscl@0.9.0/jscl.js'
@@ -249,8 +260,13 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
    * Format the result for display
    */
   private _formatResult(result: any): string {
-    if (result === null || result === undefined) {
-      return String(result);
+    // Handle Common Lisp NIL (represented as null in JavaScript)
+    if (result === null) {
+      return 'NIL';
+    }
+
+    if (result === undefined) {
+      return 'undefined';
     }
 
     // JSCL returns JavaScript values

@@ -17,7 +17,7 @@ setup(
     license="BSD-3-Clause",
     packages=["jupyterlite_jscl_kernel"],
     install_requires=[
-        "jupyterlite-core>=0.3.0,<0.4.0",
+        "jupyterlite-core>=0.3.0,<1.0.0",
     ],
     python_requires=">=3.8",
     include_package_data=True,

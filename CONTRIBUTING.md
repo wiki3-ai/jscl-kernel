@@ -113,6 +113,14 @@ The kernel loads JSCL in the worker context:
 - Falls back to loading from CDN (https://cdn.jsdelivr.net/npm/jscl@0.9.0/jscl.js)
 - Uses `jscl.evaluateString()` to execute Common Lisp code
 
+**Security Note**: The current implementation loads JSCL from a CDN without Subresource Integrity (SRI) checks. For production deployments, consider:
+
+1. Bundling JSCL directly with the kernel
+2. Adding SRI hash verification if loading from CDN
+3. Using a private CDN or hosting JSCL yourself
+
+To bundle JSCL directly, add it as a dependency and import it in `worker.ts` instead of using `importScripts()`.
+
 ### Message Flow
 
 1. User enters code in notebook
