@@ -5,6 +5,12 @@
 
 import { IJSCLWorkerKernel } from './tokens';
 import { KernelMessage } from '@jupyterlab/services';
+import type { IJSCL } from './jscl.d';
+
+// Type assertion helper for accessing jscl on global scope
+const getJSCL = (): IJSCL | undefined => {
+  return (self as unknown as { jscl?: IJSCL }).jscl;
+};
 
 export class JSCLRemoteKernel {
   private _executionCount = 0;
@@ -60,9 +66,9 @@ export class JSCLRemoteKernel {
     }
 
     try {
-      // Load JSCL from the npm package
-      // The jscl package exports the compiled JavaScript runtime
-      importScripts('https://cdn.jsdelivr.net/npm/jscl@0.8.4/jscl.js');
+      // Load JSCL from the CDN
+      // Using version 0.8.2 to match the package.json dependency
+      importScripts('https://cdn.jsdelivr.net/npm/jscl@0.8.2/jscl.js');
       this._jsclLoaded = true;
     } catch (e) {
       console.error('Failed to load JSCL:', e);
@@ -81,17 +87,18 @@ export class JSCLRemoteKernel {
         await this._loadJSCL();
       }
 
+      const jscl = getJSCL();
+      if (!jscl) {
+        throw new Error('JSCL runtime not loaded');
+      }
+
       // Capture output during evaluation
-      const outputs: string[] = [];
-      const originalWriteString = (self as any).jscl?.internals?.[
-        '%write-string'
-      ];
+      const originalWriteString = jscl.internals?.['%write-string'];
 
       // Set up output capture
-      if ((self as any).jscl && (self as any).jscl.internals) {
-        (self as any).jscl.internals['%write-string'] = (str: string) => {
-          outputs.push(str);
-          // Also stream output immediately
+      if (jscl.internals) {
+        jscl.internals['%write-string'] = (str: string) => {
+          // Stream output immediately
           postMessage({
             type: 'stream',
             bundle: { name: 'stdout', text: str }
@@ -100,11 +107,11 @@ export class JSCLRemoteKernel {
       }
 
       // Evaluate the Common Lisp code
-      const result = (self as any).jscl.evaluateString(code);
+      const result = jscl.evaluateString(code);
 
       // Restore original write function
-      if (originalWriteString && (self as any).jscl?.internals) {
-        (self as any).jscl.internals['%write-string'] = originalWriteString;
+      if (originalWriteString && jscl.internals) {
+        jscl.internals['%write-string'] = originalWriteString;
       }
 
       this._executionCount++;
