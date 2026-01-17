@@ -15,5 +15,5 @@ except ImportError:
 def _jupyter_labextension_paths():
     return [{
         "src": "labextension",
-        "dest": "@jupyterlite/jscl-kernel-extension"
+        "dest": "@jupyterlite/jscl-kernel"
     }]
