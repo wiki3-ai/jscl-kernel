@@ -40,6 +40,13 @@ dev = [
     "jupyter-packaging",
 ]
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
+kernels = [
+    "jscl-kernel @ file:./jupyterlite_jscl_kernel",
+]
+
 [tool.hatch.build]
 artifacts = [
     "jupyterlite_jscl_kernel/labextension",
