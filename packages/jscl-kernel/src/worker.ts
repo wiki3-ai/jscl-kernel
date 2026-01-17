@@ -15,7 +15,6 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
    */
   async initialize(options: IJSCLWorkerKernel.IOptions): Promise<void> {
     // Override console methods to post messages
-    // eslint-disable-next-line no-console
     console.log = (...args: any[]) => {
       const bundle = {
         name: 'stdout',
@@ -26,7 +25,6 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
         bundle
       });
     };
-    // eslint-disable-next-line no-console
     console.info = console.log;
 
     console.error = (...args: any[]) => {
