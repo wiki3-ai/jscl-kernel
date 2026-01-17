@@ -36,8 +36,8 @@
   },
   "dependencies": {
     "@jupyterlab/application": "^4.0.0",
-    "@jupyterlite/services": "^0.7.0",
-    "@jupyterlite/jscl-kernel": "^0.1.0"
+    "@jupyterlite/jscl-kernel": "^0.1.0",
+    "@jupyterlite/services": "^0.7.0"
   },
   "devDependencies": {
     "rimraf": "~5.0.1",

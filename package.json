@@ -31,6 +31,7 @@
     "build:prod": "lerna run build:prod",
     "clean": "lerna run clean",
     "clean:all": "lerna run clean && rimraf node_modules",
+    "install:extension": "jupyter labextension develop --overwrite .",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "eslint:check": "eslint . --ext .ts,.tsx",
     "lint": "yarn run eslint && yarn run prettier",

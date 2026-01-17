@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0.3.2"]
 build-backend = "hatchling.build"
 
 [project]
@@ -62,14 +62,14 @@ ensured-targets = [
     "jupyterlite_jscl_kernel/labextension/static/style.js",
     "jupyterlite_jscl_kernel/labextension/package.json",
 ]
-skip-if-exists = []
+skip-if-exists = ["jupyterlite_jscl_kernel/labextension/static/style.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 build_cmd = "build:prod"
-npm = ["yarn"]
+npm = ["jlpm"]
 
 [tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
-build_cmd = "build"
-npm = ["yarn"]
+build_cmd = "build:prod"
+npm = ["jlpm"]
 source_dir = "packages/jscl-kernel-extension"
 build_dir = "jupyterlite_jscl_kernel/labextension"
