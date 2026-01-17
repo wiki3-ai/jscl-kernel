@@ -62,14 +62,14 @@ ensured-targets = [
     "jupyterlite_jscl_kernel/labextension/static/style.js",
     "jupyterlite_jscl_kernel/labextension/package.json",
 ]
-skip-if-exists = ["jupyterlite_jscl_kernel/labextension/static/style.js"]
+skip-if-exists = []
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 build_cmd = "build:prod"
-npm = ["jlpm"]
+npm = ["yarn"]
 
 [tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
 build_cmd = "build"
-npm = ["jlpm"]
+npm = ["yarn"]
 source_dir = "packages/jscl-kernel-extension"
 build_dir = "jupyterlite_jscl_kernel/labextension"
