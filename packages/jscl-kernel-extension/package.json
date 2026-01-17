@@ -28,18 +28,32 @@
     "src/**/*.{ts,tsx}"
   ],
   "scripts": {
-    "build": "tsc -b",
-    "build:prod": "tsc -b",
-    "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
-    "prepublishOnly": "npm run build",
-    "watch": "tsc -b --watch"
+    "build": "jlpm build:lib && jlpm build:labextension:dev",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:lib": "tsc -b",
+    "build:prod": "jlpm clean && jlpm build:lib && jlpm build:labextension",
+    "clean": "jlpm clean:lib",
+    "clean:all": "jlpm clean:lib && jlpm clean:labextension",
+    "clean:labextension": "rimraf ../../jupyterlite_jscl_kernel/labextension",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "install:extension": "jlpm build",
+    "watch": "run-p watch:src watch:labextension",
+    "watch:labextension": "jupyter labextension watch .",
+    "watch:src": "tsc -w",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@jupyterlab/application": "^4.0.0",
     "@jupyterlite/jscl-kernel": "^0.1.0",
-    "@jupyterlite/services": "^0.7.0"
+    "@jupyterlite/services": "^0.7.0",
+    "react": "^18.2.0"
   },
   "devDependencies": {
+    "@jupyterlab/builder": "^4.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
+    "npm-run-all2": "^6.1.1",
     "rimraf": "~5.0.1",
     "typescript": "~5.0.2"
   },
@@ -47,6 +61,16 @@
     "access": "public"
   },
   "jupyterlab": {
-    "extension": true
+    "extension": true,
+    "outputDir": "../../jupyterlite_jscl_kernel/labextension",
+    "sharedPackages": {
+      "@jupyterlite/services": {
+        "bundled": false,
+        "singleton": true
+      }
+    }
+  },
+  "jupyterlite": {
+    "liteExtension": true
   }
 }

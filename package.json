@@ -27,8 +27,8 @@
     ]
   },
   "scripts": {
-    "build": "lerna run build",
-    "build:prod": "lerna run build:prod",
+    "build": "lerna run build && node scripts/copy-extension.js",
+    "build:prod": "lerna run build:prod && node scripts/copy-extension.js",
     "build:test": "lerna run build:test",
     "bump:js:version": "lerna version --no-push --force-publish --no-git-tag-version --yes",
     "clean": "lerna run clean",
@@ -56,7 +56,8 @@
     "npm-run-all2": "^7.0.1",
     "prettier": "^3.0.0",
     "rimraf": "^5.0.1",
-    "shell-quote": "^1.7.2"
+    "shell-quote": "^1.7.2",
+    "typescript": "~5.0.2"
   },
   "dependencies": {
     "gyp": "^0.5.0",
