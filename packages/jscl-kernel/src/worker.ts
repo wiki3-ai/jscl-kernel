@@ -14,6 +14,10 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
    * @param options The options for the kernel.
    */
   async initialize(options: IJSCLWorkerKernel.IOptions): Promise<void> {
+    // Save original console for debugging
+    const originalLog = console.log;
+    const originalError = console.error;
+    
     // Override console methods to post messages
     console.log = (...args: any[]) => {
       const bundle = {
@@ -54,12 +58,15 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
 
     // Load JSCL
     try {
+      originalLog('[JSCL Worker] Starting initialization...');
       // Try to import JSCL from global scope first
       // @ts-expect-error JSCL is loaded globally
       if (typeof self.jscl !== 'undefined') {
+        originalLog('[JSCL Worker] Found JSCL in global scope');
         // @ts-expect-error JSCL is loaded globally
         this._jsclEval = self.jscl.evaluateString;
       } else {
+        originalLog('[JSCL Worker] Loading JSCL from CDN...');
         // Load JSCL from CDN if not bundled
         // Note: In production, consider bundling JSCL directly or using SRI
         // for enhanced security. See CONTRIBUTING.md for details.
@@ -67,10 +74,13 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
         (self as any).importScripts(
           'https://cdn.jsdelivr.net/npm/jscl@0.9.0/jscl.js'
         );
+        originalLog('[JSCL Worker] JSCL loaded from CDN');
         // @ts-expect-error JSCL is loaded globally
         this._jsclEval = self.jscl.evaluateString;
       }
+      originalLog('[JSCL Worker] Initialization complete, _jsclEval:', typeof this._jsclEval);
     } catch (e) {
+      originalError('[JSCL Worker] Failed to load JSCL:', e);
       console.error('Failed to load JSCL:', e);
       throw e;
     }
@@ -84,9 +94,13 @@ export class JSCLRemoteKernel implements IJSCLWorkerKernel {
     parent: any
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     const { code } = content;
+    console.log('[JSCL Worker] Execute called with code:', code);
+    console.log('[JSCL Worker] _jsclEval type:', typeof this._jsclEval);
     try {
       // Evaluate the Common Lisp code using JSCL
+      console.log('[JSCL Worker] Calling _jsclEval...');
       const result = this._jsclEval(code);
+      console.log('[JSCL Worker] _jsclEval returned:', result);
       this._executionCount++;
 
       const textPlain = this._formatResult(result);

@@ -187,7 +187,7 @@ export class JSCLKernel extends BaseKernel implements IKernel {
    */
   protected initRemote(options: JSCLKernel.IOptions): IRemoteJSCLWorkerKernel {
     const remote = wrap<IRemoteJSCLWorkerKernel>(this._worker);
-    void remote.initialize({});
+    remote.initialize({});
     return remote;
   }
 

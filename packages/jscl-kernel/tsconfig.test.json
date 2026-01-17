@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfigbase.json",
+  "compilerOptions": {
+    "types": ["jest", "node"],
+    "outDir": "lib-test",
+    "rootDir": ".",
+    "module": "esnext"
+  },
+  "include": ["src/**/*", "test/**/*"]
+}
