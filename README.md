@@ -44,15 +44,42 @@ To install for development:
 git clone https://github.com/wiki3-ai/jscl-kernel.git
 cd jscl-kernel
 
-# Install dependencies
+# Install dependencies and build the packages
 yarn install
-
-# Build the packages
 yarn run build
 
 # Install the Python package in development mode
-pip install -e .
+pip install -e "."
+
+# Build your JupyterLite site
+jupyter lite build
 ```
+
+### Watching for changes
+
+To automatically rebuild when you make changes to the TypeScript source:
+
+```bash
+# In one terminal, watch and rebuild on changes
+yarn run watch
+
+# In another terminal, rebuild your JupyterLite site as needed
+jupyter lite build
+```
+
+### Optional: Testing in JupyterLab
+
+If you want to test the kernel in a full JupyterLab environment (not just JupyterLite):
+
+```bash
+# After building, link the extension for JupyterLab development
+jupyter labextension develop packages/jscl-kernel-extension --overwrite
+
+# Then run JupyterLab
+jupyter lab
+```
+
+Note: JupyterLite kernels are primarily designed for JupyterLite (browser-based Jupyter), not for full JupyterLab. The `jupyter labextension develop` command is only useful for testing the extension loading mechanism in JupyterLab.
 
 ## Usage
 

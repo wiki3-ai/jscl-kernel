@@ -34,7 +34,7 @@
     "clean": "lerna run clean",
     "clean:all": "lerna run clean && rimraf node_modules",
     "install:dev": "yarn run build:prod && yarn run develop",
-    "install:extension": "jupyter labextension develop --overwrite .",
+    "install:extension": "jupyter labextension develop --overwrite packages/jscl-kernel-extension",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "eslint:check": "eslint . --ext .ts,.tsx",
     "lint": "yarn run eslint && yarn run prettier",
@@ -57,5 +57,9 @@
     "prettier": "^3.0.0",
     "rimraf": "^5.0.1",
     "shell-quote": "^1.7.2"
+  },
+  "dependencies": {
+    "gyp": "^0.5.0",
+    "react": "^19.2.3"
   }
 }
