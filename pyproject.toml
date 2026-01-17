@@ -24,8 +24,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 dependencies = [ 
-    "jupyterlite>=0.6.4",
-    "jupyterlite-core>=0.6.4",
+    "jupyterlite<0.7.1",
+    "jupyterlite-core<0.7.1",
 ]
 
 [project.license]
