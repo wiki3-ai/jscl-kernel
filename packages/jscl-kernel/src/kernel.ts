@@ -205,7 +205,10 @@ export class JSCLKernel extends BaseKernel implements IKernel {
    */
   protected initRemote(options: JSCLKernel.IOptions): IRemoteJSCLWorkerKernel {
     const remote: IRemoteJSCLWorkerKernel = wrap(this._worker);
-    remote.initialize({ baseUrl: PageConfig.getBaseUrl() });
+    const baseUrl = PageConfig.getBaseUrl();
+    // JSCL is bundled as a static asset in the extension
+    const jsclUrl = `${baseUrl}extensions/@jupyterlite/jscl-kernel-extension/static/jscl.js`;
+    remote.initialize({ baseUrl, jsclUrl });
     return remote;
   }
 

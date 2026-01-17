@@ -31,5 +31,10 @@ export namespace IJSCLWorkerKernel {
   /**
    * Initialization options for a worker.
    */
-  export interface IOptions extends IWorkerKernel.IOptions {}
+  export interface IOptions extends IWorkerKernel.IOptions {
+    /**
+     * The URL to load the JSCL library from.
+     */
+    jsclUrl?: string;
+  }
 }

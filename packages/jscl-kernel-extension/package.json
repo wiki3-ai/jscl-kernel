@@ -23,9 +23,9 @@
     "lib/*.js"
   ],
   "scripts": {
-    "build": "jlpm build:lib && jlpm build:labextension:dev",
-    "build:labextension": "jupyter labextension build .",
-    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build": "jlpm build:lib && jlpm build:labextension:dev && jlpm copy:jscl",
+    "build:labextension": "jupyter labextension build . && jlpm copy:jscl",
+    "build:labextension:dev": "jupyter labextension build --development True . && jlpm copy:jscl",
     "build:lib": "tsc -b",
     "build:prod": "jlpm clean && jlpm build:lib && jlpm build:labextension",
     "clean": "jlpm clean:lib",
@@ -33,6 +33,7 @@
     "clean:dist": "rimraf dist",
     "clean:labextension": "rimraf ../../jupyterlite_jscl_kernel/labextension",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "copy:jscl": "node -e \"require('fs').copyFileSync(require.resolve('jscl/jscl.js'), '../../jupyterlite_jscl_kernel/labextension/static/jscl.js')\"",
     "install:extension": "jlpm build",
     "watch": "run-p watch:src watch:labextension",
     "watch:labextension": "jupyter labextension watch .",
@@ -41,7 +42,8 @@
   "dependencies": {
     "@jupyterlab/application": "^4.5.0",
     "@jupyterlite/jscl-kernel": "^0.1.0",
-    "@jupyterlite/services": "^0.7.0"
+    "@jupyterlite/services": "^0.7.0",
+    "jscl": "^0.8.2"
   },
   "devDependencies": {
     "@jupyterlab/builder": "^4.5.0",

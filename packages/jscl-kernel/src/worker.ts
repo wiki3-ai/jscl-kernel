@@ -15,6 +15,7 @@ const getJSCL = (): IJSCL | undefined => {
 export class JSCLRemoteKernel {
   private _executionCount = 0;
   private _jsclLoaded = false;
+  private _jsclUrl = '';
 
   /**
    * Initialize the remote kernel.
@@ -22,6 +23,9 @@ export class JSCLRemoteKernel {
    * @param options The options for the kernel.
    */
   async initialize(options: IJSCLWorkerKernel.IOptions) {
+    // Store the JSCL URL for loading later
+    this._jsclUrl = options.jsclUrl || '';
+
     // Override console.log to send output to the notebook
     // eslint-disable-next-line no-console
     console.log = (...args: any[]) => {
@@ -66,9 +70,11 @@ export class JSCLRemoteKernel {
     }
 
     try {
-      // Load JSCL from the CDN
-      // Using version 0.8.2 to match the package.json dependency
-      importScripts('https://cdn.jsdelivr.net/npm/jscl@0.8.2/jscl.js');
+      // Load JSCL from the provided URL (bundled with the extension)
+      if (!this._jsclUrl) {
+        throw new Error('JSCL URL not provided');
+      }
+      importScripts(this._jsclUrl);
       this._jsclLoaded = true;
     } catch (e) {
       console.error('Failed to load JSCL:', e);
