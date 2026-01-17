@@ -23,7 +23,10 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
-dependencies = [ ]
+dependencies = [ 
+    "jupyterlite>=0.6.4",
+    "jupyterlite-core>=0.6.4",
+]
 
 [project.license]
 file = "LICENSE"
@@ -32,7 +35,6 @@ file = "LICENSE"
 Homepage = "https://github.com/wiki3-ai/jscl-kernel"
 Source = "https://github.com/wiki3-ai/jscl-kernel"
 Tracker = "https://github.com/wiki3-ai/jscl-kernel/issues"
-
 
 [tool.hatch.version]
 source = "nodejs"
@@ -72,3 +74,8 @@ build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
 build_dir = "jupyterlite_jscl_kernel/labextension"
+
+[project.optional-dependencies]
+kernels = [
+    "jscl-kernel @ file:./"
+]
