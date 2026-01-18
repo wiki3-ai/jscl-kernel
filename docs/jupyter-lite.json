@@ -9,8 +9,14 @@
     "federated_extensions": [
       {
         "extension": "./extension",
-        "load": "static/remoteEntry.2206d4575e32698230a7.js",
+        "load": "static/remoteEntry.f2c536a87b0dc4e22dfa.js",
         "name": "@jupyterlite/jscl-kernel-extension"
+      },
+      {
+        "extension": "./extension",
+        "load": "static/remoteEntry.5cbb9d2323598fbda535.js",
+        "name": "jupyterlab_pygments",
+        "style": "./style"
       }
     ],
     "fileTypes": {
