@@ -75,24 +75,19 @@ export class JSCLRemoteKernel {
         throw new Error('JSCL URL not provided');
       }
 
-      // The npm jscl@0.8.2 package only exports to `window.jscl` or `module.exports`,
-      // but Web Workers have neither `window` nor `module`. The upstream GitHub source
-      // now exports to `self.jscl` as well, but that fix hasn't been released to npm.
-      // As a workaround, we temporarily set `self.window = self` so the JSCL script
-      // assigns `window.jscl` which becomes `self.jscl`.
-      const selfAny = self as unknown as { window?: typeof self };
-      const hadWindow = 'window' in selfAny;
-      const prevWindow = selfAny.window;
-      selfAny.window = self;
+      // The jscl.js is patched during build (see scripts/patch-jscl.js) to
+      // export to `self` which works in WebWorkers. We also define `window`
+      // pointing to `self` so JSCL code using #j:window works correctly.
+      (self as unknown as { window: typeof self }).window = self;
 
-      importScripts(this._jsclUrl);
-
-      // Restore the original state
-      if (hadWindow) {
-        selfAny.window = prevWindow;
-      } else {
-        delete selfAny.window;
+      // Use fetch+eval since importScripts is not available in module workers
+      const response = await fetch(this._jsclUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch JSCL: ${response.status} ${response.statusText}`);
       }
+      const jsclCode = await response.text();
+      // eslint-disable-next-line no-eval
+      (0, eval)(jsclCode);
 
       this._jsclLoaded = true;
     } catch (e) {

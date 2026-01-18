@@ -33,7 +33,7 @@
     "clean:dist": "rimraf dist",
     "clean:labextension": "rimraf ../../jupyterlite_jscl_kernel/labextension",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
-    "copy:jscl": "node -e \"require('fs').copyFileSync(require.resolve('jscl/jscl.js'), '../../jupyterlite_jscl_kernel/labextension/static/jscl.js')\"",
+    "copy:jscl": "node -e \"require('fs').copyFileSync(require.resolve('jscl/jscl.js'), '../../jupyterlite_jscl_kernel/labextension/static/jscl.js')\" && node scripts/patch-jscl.js",
     "install:extension": "jlpm build",
     "watch": "run-p watch:src watch:labextension",
     "watch:labextension": "jupyter labextension watch .",
