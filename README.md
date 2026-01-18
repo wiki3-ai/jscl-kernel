@@ -30,7 +30,9 @@ jupyter lite build
 git checkout gh-pages
 pip install jupyterlite-core .
 jupyter lite build --output-dir docs
-git commit -am "Rebuild gh-pages docs" docs
+git add docs
+git commit -m "Rebuild gh-pages docs" docs
+git push
 ```
 
 ### For Development
