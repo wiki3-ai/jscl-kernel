@@ -58,6 +58,16 @@
     "extension": true,
     "outputDir": "../../jupyterlite_jscl_kernel/labextension",
     "sharedPackages": {
+      "@jupyterlab/coreutils": {
+        "bundled": false,
+        "singleton": true,
+        "requiredVersion": "^6.0.0"
+      },
+      "@lumino/coreutils": {
+        "bundled": false,
+        "singleton": true,
+        "requiredVersion": "^2.0.0"
+      },
       "@jupyterlite/services": {
         "bundled": false,
         "singleton": true
