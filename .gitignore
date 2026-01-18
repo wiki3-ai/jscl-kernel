@@ -3,8 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Don't ignore any of the statis site build in docs/
-docs/
+# Do not ignore documentation (note: you must unignore the directory itself)
+!docs/
 !docs/**
 
 # C extensions
