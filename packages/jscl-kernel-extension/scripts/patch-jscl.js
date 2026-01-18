@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
  * Patch jscl.js to add WebWorker support.
- * 
+ *
  * The npm jscl@0.8.2 package only exports to `window` or `module.exports`,
  * but WebWorkers have neither. The upstream GitHub master branch has a fix
  * that exports to `self`, but it hasn't been released to npm yet.
- * 
+ *
  * This script patches the copied jscl.js to use `self` instead of `window`,
  * which works in both browsers (where self === window) and WebWorkers.
  */
@@ -13,7 +13,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const jsclPath = path.resolve(__dirname, '../../../jupyterlite_jscl_kernel/labextension/static/jscl.js');
+const jsclPath = path.resolve(
+  __dirname,
+  '../../../jupyterlite_jscl_kernel/labextension/static/jscl.js'
+);
 
 console.log('Patching jscl.js for WebWorker support...');
 
@@ -38,6 +41,8 @@ if (content.includes(oldExport)) {
   console.log('jscl.js already has WebWorker support.');
 } else {
   console.error('ERROR: Could not find expected export pattern in jscl.js');
-  console.error('The jscl package may have been updated. Please check the export code manually.');
+  console.error(
+    'The jscl package may have been updated. Please check the export code manually.'
+  );
   process.exit(1);
 }
