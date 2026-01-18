@@ -1,0 +1,84 @@
+{
+  "name": "@jupyterlite/jscl-kernel-extension",
+  "version": "0.1.0",
+  "description": "JupyterLite - JSCL Kernel Extension",
+  "homepage": "https://github.com/wiki3-ai/jscl-kernel",
+  "bugs": {
+    "url": "https://github.com/wiki3-ai/jscl-kernel/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wiki3-ai/jscl-kernel.git"
+  },
+  "license": "GPL-3.0-or-later",
+  "author": "JSCL Kernel Contributors",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "directories": {
+    "lib": "lib/"
+  },
+  "files": [
+    "lib/*.d.ts",
+    "lib/*.js.map",
+    "lib/*.js"
+  ],
+  "scripts": {
+    "build": "jlpm build:lib && jlpm build:labextension:dev && jlpm copy:jscl",
+    "build:labextension": "jupyter labextension build . && jlpm copy:jscl",
+    "build:labextension:dev": "jupyter labextension build --development True . && jlpm copy:jscl",
+    "build:lib": "tsc -b",
+    "build:prod": "jlpm clean && jlpm build:lib && jlpm build:labextension",
+    "clean": "jlpm clean:lib",
+    "clean:all": "jlpm clean:lib && jlpm run clean:dist && jlpm clean:labextension",
+    "clean:dist": "rimraf dist",
+    "clean:labextension": "rimraf ../../jupyterlite_jscl_kernel/labextension",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "copy:jscl": "node -e \"require('fs').copyFileSync(require.resolve('jscl/jscl.js'), '../../jupyterlite_jscl_kernel/labextension/static/jscl.js')\" && node scripts/patch-jscl.js",
+    "install:extension": "jlpm build",
+    "watch": "run-p watch:src watch:labextension",
+    "watch:labextension": "jupyter labextension watch .",
+    "watch:src": "tsc -w"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "^4.5.0",
+    "@jupyterlite/jscl-kernel": "^0.1.0",
+    "@jupyterlite/services": "^0.7.0",
+    "jscl": "^0.8.2"
+  },
+  "devDependencies": {
+    "@jupyterlab/builder": "^4.5.0",
+    "npm-run-all2": "^7.0.1",
+    "rimraf": "~5.0.1",
+    "typescript": "~5.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "jupyterlab": {
+    "extension": true,
+    "outputDir": "../../jupyterlite_jscl_kernel/labextension",
+    "sharedPackages": {
+      "@jupyterlab/coreutils": {
+        "bundled": false,
+        "singleton": true,
+        "requiredVersion": "^6.0.0"
+      },
+      "@lumino/coreutils": {
+        "bundled": false,
+        "singleton": true,
+        "requiredVersion": "^2.0.0"
+      },
+      "@jupyterlite/services": {
+        "bundled": false,
+        "singleton": true
+      }
+    },
+    "_build": {
+      "load": "static/remoteEntry.2206d4575e32698230a7.js",
+      "extension": "./extension"
+    }
+  },
+  "jupyterlite": {
+    "liteExtension": true
+  }
+}
