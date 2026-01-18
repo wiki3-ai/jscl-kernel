@@ -112,63 +112,47 @@ export class JSCLRemoteKernel {
         throw new Error('JSCL runtime not loaded');
       }
 
-      // Capture output during evaluation
-      const originalWriteString = jscl.internals?.['%write-string'];
-      const capturedOutput: string[] = [];
+      // Capture stdout by redirecting *standard-output* to a string stream.
+      // Use standard Common Lisp with-output-to-string macro.
+      // We evaluate two expressions: first to capture output and result,
+      // then to store them in JS-accessible globals.
+      const wrappedCode = `
+        (let ((jscl-kernel::*captured-output* "")
+              (jscl-kernel::*result-value* nil))
+          (setq jscl-kernel::*captured-output*
+                (with-output-to-string (*standard-output*)
+                  (setq jscl-kernel::*result-value* ${code})))
+          ;; Store in JS for retrieval
+          (setf (jscl::oget (jscl::%js-vref "self") "__kernel_stdout__")
+                (jscl::lisp-to-js jscl-kernel::*captured-output*))
+          (setf (jscl::oget (jscl::%js-vref "self") "__kernel_result__")
+                (jscl::lisp-to-js (prin1-to-string jscl-kernel::*result-value*)))
+          jscl-kernel::*result-value*)
+      `;
 
-      // Set up output capture - collect output synchronously
-      if (jscl.internals) {
-        jscl.internals['%write-string'] = (str: string) => {
-          capturedOutput.push(str);
-        };
-      }
+      // Evaluate the user's code with output capture
+      jscl.evaluateString(wrappedCode);
 
-      // First, evaluate the user's code to capture any output
-      const rawResult = jscl.evaluateString(code);
+      // Retrieve captured stdout and result from JS globals
+      const capturedStdout = (self as any).__kernel_stdout__ as string | undefined;
+      const formattedResult = (self as any).__kernel_result__ as string | undefined;
 
-      // Now format the result using prin1-to-string (this won't produce stdout)
-      // Store the raw result in a temp var so we can access it from Lisp
-      const tempVar = '__kernel_temp_result__';
-      (self as any)[tempVar] = rawResult;
-      let formattedResult: unknown;
-      try {
-        formattedResult = jscl.evaluateString(
-          `(prin1-to-string (jscl::oget (jscl::%js-vref "self") "${tempVar}"))`
-        );
-      } finally {
-        delete (self as any)[tempVar];
-      }
-
-      // Restore original write function
-      if (originalWriteString && jscl.internals) {
-        jscl.internals['%write-string'] = originalWriteString;
-      }
+      // Clean up
+      delete (self as any).__kernel_stdout__;
+      delete (self as any).__kernel_result__;
 
       this._executionCount++;
 
       // Send captured stdout FIRST, before the result
-      if (capturedOutput.length > 0) {
+      if (capturedStdout && capturedStdout.length > 0) {
         postMessage({
           type: 'stream',
-          bundle: { name: 'stdout', text: capturedOutput.join('') }
+          bundle: { name: 'stdout', text: capturedStdout }
         });
       }
 
       // Result is already a formatted string from prin1-to-string
-      // Convert JSCL lisp string to JS string
-      let textPlain: string | undefined;
-      if (formattedResult !== undefined && formattedResult !== null) {
-        // Use lisp_to_js which handles JSCL strings (arrays with stringp=1)
-        // and other value conversions
-        const internals = jscl.internals as any;
-        if (internals?.lisp_to_js) {
-          textPlain = internals.lisp_to_js(formattedResult);
-        } else if (internals?.xstring && Array.isArray(formattedResult)) {
-          textPlain = internals.xstring(formattedResult);
-        } else {
-          textPlain = String(formattedResult);
-        }
-      }
+      const textPlain = formattedResult;
       
       const data: { ['text/plain']?: string } = {};
       if (
