@@ -83,6 +83,7 @@ jlpm test
 Integration tests use Playwright to test the kernel in a real browser environment:
 
 ```bash
+sudo -E npx playwright install-deps && npx playwright install
 pip install pytest pytest-playwright
 playwright install chromium
 jupyter lite build --output-dir dist

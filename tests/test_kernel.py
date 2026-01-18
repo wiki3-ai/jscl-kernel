@@ -13,6 +13,8 @@ import subprocess
 import time
 import os
 import signal
+import sys
+import re
 
 # Port for the JupyterLite server
 JUPYTERLITE_PORT = 8888
@@ -28,7 +30,7 @@ def jupyterlite_server():
     
     # Start a simple HTTP server
     server = subprocess.Popen(
-        ["python", "-m", "http.server", str(JUPYTERLITE_PORT)],
+        [sys.executable, "-m", "http.server", str(JUPYTERLITE_PORT)],
         cwd=dist_dir,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
@@ -57,8 +59,8 @@ def test_kernel_available(page: Page, jupyterlite_server: str):
     
     # Check that the JSCL kernel is available
     # The kernel should appear in the launcher
-    lisp_kernel = page.locator('text=Common Lisp (JSCL)')
-    expect(lisp_kernel).to_be_visible(timeout=10000)
+    lisp_kernel = page.get_by_role("button", name=re.compile(r"Common Lisp \(JSCL\)"))
+    expect(lisp_kernel.first).to_be_visible(timeout=10000)
 
 
 def test_simple_evaluation(page: Page, jupyterlite_server: str):
@@ -70,7 +72,7 @@ def test_simple_evaluation(page: Page, jupyterlite_server: str):
     
     # Create a new notebook with JSCL kernel
     # Click on the JSCL kernel card in the launcher
-    page.locator('text=Common Lisp (JSCL)').click()
+    page.get_by_role("button", name=re.compile(r"Common Lisp \(JSCL\)")).first.click()
     page.wait_for_timeout(3000)
     
     # Wait for the notebook to be ready
@@ -90,7 +92,7 @@ def test_simple_evaluation(page: Page, jupyterlite_server: str):
     
     # Check for output (should be 6)
     output = page.locator('.jp-OutputArea-output')
-    expect(output).to_contain_text('6', timeout=10000)
+    expect(output.last).to_contain_text('6', timeout=10000)
 
 
 def test_defun_and_call(page: Page, jupyterlite_server: str):
@@ -101,7 +103,7 @@ def test_defun_and_call(page: Page, jupyterlite_server: str):
     page.wait_for_timeout(5000)
     
     # Create a new notebook with JSCL kernel
-    page.locator('text=Common Lisp (JSCL)').click()
+    page.get_by_role("button", name=re.compile(r"Common Lisp \(JSCL\)")).first.click()
     page.wait_for_timeout(3000)
     
     # Wait for the notebook to be ready
@@ -139,7 +141,7 @@ def test_print_output(page: Page, jupyterlite_server: str):
     page.wait_for_timeout(5000)
     
     # Create a new notebook with JSCL kernel
-    page.locator('text=Common Lisp (JSCL)').click()
+    page.get_by_role("button", name=re.compile(r"Common Lisp \(JSCL\)")).first.click()
     page.wait_for_timeout(3000)
     
     # Wait for the notebook to be ready
@@ -159,7 +161,7 @@ def test_print_output(page: Page, jupyterlite_server: str):
     
     # Check for output
     output = page.locator('.jp-OutputArea-output')
-    expect(output).to_contain_text('Hello', timeout=10000)
+    expect(output.last).to_contain_text('Hello', timeout=10000)
 
 
 def test_loop_macro(page: Page, jupyterlite_server: str):
@@ -170,7 +172,7 @@ def test_loop_macro(page: Page, jupyterlite_server: str):
     page.wait_for_timeout(5000)
     
     # Create a new notebook with JSCL kernel
-    page.locator('text=Common Lisp (JSCL)').click()
+    page.get_by_role("button", name=re.compile(r"Common Lisp \(JSCL\)")).first.click()
     page.wait_for_timeout(3000)
     
     # Wait for the notebook to be ready
@@ -191,4 +193,4 @@ def test_loop_macro(page: Page, jupyterlite_server: str):
     # Check for output (should be a list of squares: 1 4 9 16 25)
     output = page.locator('.jp-OutputArea-output')
     # The output should contain at least some of the expected numbers
-    expect(output).to_be_visible(timeout=10000)
+    expect(output.last).to_be_visible(timeout=10000)
