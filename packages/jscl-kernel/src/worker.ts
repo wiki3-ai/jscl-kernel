@@ -74,7 +74,26 @@ export class JSCLRemoteKernel {
       if (!this._jsclUrl) {
         throw new Error('JSCL URL not provided');
       }
+
+      // The npm jscl@0.8.2 package only exports to `window.jscl` or `module.exports`,
+      // but Web Workers have neither `window` nor `module`. The upstream GitHub source
+      // now exports to `self.jscl` as well, but that fix hasn't been released to npm.
+      // As a workaround, we temporarily set `self.window = self` so the JSCL script
+      // assigns `window.jscl` which becomes `self.jscl`.
+      const selfAny = self as unknown as { window?: typeof self };
+      const hadWindow = 'window' in selfAny;
+      const prevWindow = selfAny.window;
+      selfAny.window = self;
+
       importScripts(this._jsclUrl);
+
+      // Restore the original state
+      if (hadWindow) {
+        selfAny.window = prevWindow;
+      } else {
+        delete selfAny.window;
+      }
+
       this._jsclLoaded = true;
     } catch (e) {
       console.error('Failed to load JSCL:', e);
