@@ -83,7 +83,9 @@ export class JSCLRemoteKernel {
       // Use fetch+eval since importScripts is not available in module workers
       const response = await fetch(this._jsclUrl);
       if (!response.ok) {
-        throw new Error(`Failed to fetch JSCL: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch JSCL: ${response.status} ${response.statusText}`
+        );
       }
       const jsclCode = await response.text();
       // eslint-disable-next-line no-eval
@@ -134,8 +136,12 @@ export class JSCLRemoteKernel {
       jscl.evaluateString(wrappedCode);
 
       // Retrieve captured stdout and result from JS globals
-      const capturedStdout = (self as any).__kernel_stdout__ as string | undefined;
-      const formattedResult = (self as any).__kernel_result__ as string | undefined;
+      const capturedStdout = (self as any).__kernel_stdout__ as
+        | string
+        | undefined;
+      const formattedResult = (self as any).__kernel_result__ as
+        | string
+        | undefined;
 
       // Clean up
       delete (self as any).__kernel_stdout__;
@@ -153,7 +159,7 @@ export class JSCLRemoteKernel {
 
       // Result is already a formatted string from prin1-to-string
       const textPlain = formattedResult;
-      
+
       const data: { ['text/plain']?: string } = {};
       if (
         typeof textPlain === 'string' &&
