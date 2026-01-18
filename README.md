@@ -24,6 +24,15 @@ pip install jupyterlite-core jupyterlite-jscl-kernel
 jupyter lite build
 ```
 
+### For GitHub Pages
+
+```bash
+git checkout gh-pages
+pip install jupyterlite-core .
+jupyter lite build --output-dir docs
+git commit -am "Rebuild gh-pages docs" docs
+```
+
 ### For Development
 
 ```bash
