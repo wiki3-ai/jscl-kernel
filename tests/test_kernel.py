@@ -232,6 +232,43 @@ def test_print_output_ordering(page: Page, jupyterlite_server: str):
     assert '42' in first_cell_text, f"Return value not found in first cell. Got: {first_cell_text}"
 
 
+def test_multiple_forms_in_cell(page: Page, jupyterlite_server: str):
+    """Test that multiple forms in a single cell are all evaluated."""
+    page.goto(f"{jupyterlite_server}/lab")
+    
+    # Wait for JupyterLite to load
+    page.wait_for_timeout(5000)
+    
+    # Create a new notebook with JSCL kernel
+    page.get_by_role("button", name=re.compile(r"Common Lisp \(JSCL\)")).first.click()
+    page.wait_for_timeout(3000)
+    
+    # Wait for the notebook to be ready
+    page.wait_for_selector('.jp-Notebook')
+    page.wait_for_timeout(2000)
+    
+    # Type multiple forms - define a function and call it in the same cell
+    cell = page.locator('.jp-Cell-inputArea .jp-CodeMirrorEditor')
+    cell.click()
+    # Multiple forms: define, set a var, call function using var
+    page.keyboard.type('(defun triple (x) (* x 3))')
+    page.keyboard.press('Enter')
+    page.keyboard.type('(defvar *my-val* 7)')
+    page.keyboard.press('Enter')
+    page.keyboard.type('(triple *my-val*)')
+    
+    # Execute the cell
+    page.keyboard.press('Shift+Enter')
+    
+    # Wait for output
+    page.wait_for_timeout(3000)
+    
+    # The result should be 21 (7 * 3) - value of the last form
+    output = page.locator('.jp-OutputArea-output').last
+    output_text = output.inner_text()
+    assert '21' in output_text, f"Expected 21 from multiple forms, got: {output_text}"
+
+
 def test_write_to_string_formatting(page: Page, jupyterlite_server: str):
     """Test that results are formatted using write-to-string (proper Lisp formatting)."""
     page.goto(f"{jupyterlite_server}/lab")

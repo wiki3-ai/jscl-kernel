@@ -114,14 +114,14 @@ export class JSCLRemoteKernel {
 
       // Capture stdout by redirecting *standard-output* to a string stream.
       // Use standard Common Lisp with-output-to-string macro.
-      // We evaluate two expressions: first to capture output and result,
-      // then to store them in JS-accessible globals.
+      // Wrap user code in progn to handle multiple forms (cells can have 0+ forms).
+      // The result is the value of the last form, matching standard REPL behavior.
       const wrappedCode = `
         (let ((jscl-kernel::*captured-output* "")
               (jscl-kernel::*result-value* nil))
           (setq jscl-kernel::*captured-output*
                 (with-output-to-string (*standard-output*)
-                  (setq jscl-kernel::*result-value* ${code})))
+                  (setq jscl-kernel::*result-value* (progn ${code}))))
           ;; Store in JS for retrieval
           (setf (jscl::oget (jscl::%js-vref "self") "__kernel_stdout__")
                 (jscl::lisp-to-js jscl-kernel::*captured-output*))
