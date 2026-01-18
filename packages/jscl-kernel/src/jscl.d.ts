@@ -16,6 +16,8 @@ type JSCLWriteString = (str: string) => void;
  */
 interface IJSCLInternals {
   '%write-string'?: JSCLWriteString;
+  /** Convert a JSCL lisp string (array with stringp=1) to a JavaScript string */
+  xstring?: (lispString: unknown) => string;
 }
 
 /**

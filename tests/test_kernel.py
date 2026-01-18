@@ -194,3 +194,73 @@ def test_loop_macro(page: Page, jupyterlite_server: str):
     output = page.locator('.jp-OutputArea-output')
     # The output should contain at least some of the expected numbers
     expect(output.last).to_be_visible(timeout=10000)
+
+
+def test_print_output_ordering(page: Page, jupyterlite_server: str):
+    """Test that print output appears immediately in the same cell, not delayed."""
+    page.goto(f"{jupyterlite_server}/lab")
+    
+    # Wait for JupyterLite to load
+    page.wait_for_timeout(5000)
+    
+    # Create a new notebook with JSCL kernel
+    page.get_by_role("button", name=re.compile(r"Common Lisp \(JSCL\)")).first.click()
+    page.wait_for_timeout(3000)
+    
+    # Wait for the notebook to be ready
+    page.wait_for_selector('.jp-Notebook')
+    page.wait_for_timeout(2000)
+    
+    # Type code that prints AND returns a value
+    cell = page.locator('.jp-Cell-inputArea .jp-CodeMirrorEditor')
+    cell.click()
+    page.keyboard.type('(progn (print "MARKER-FIRST") 42)')
+    
+    # Execute the cell
+    page.keyboard.press('Shift+Enter')
+    
+    # Wait for output
+    page.wait_for_timeout(3000)
+    
+    # Get all outputs in the first cell - should have both the print and the result
+    first_cell = page.locator('.jp-Cell').first
+    cell_outputs = first_cell.locator('.jp-OutputArea-output')
+    
+    # Should have output(s) containing both the printed text and the result
+    first_cell_text = first_cell.locator('.jp-OutputArea').inner_text()
+    assert 'MARKER-FIRST' in first_cell_text, f"Print output not found in first cell. Got: {first_cell_text}"
+    assert '42' in first_cell_text, f"Return value not found in first cell. Got: {first_cell_text}"
+
+
+def test_write_to_string_formatting(page: Page, jupyterlite_server: str):
+    """Test that results are formatted using write-to-string (proper Lisp formatting)."""
+    page.goto(f"{jupyterlite_server}/lab")
+    
+    # Wait for JupyterLite to load
+    page.wait_for_timeout(5000)
+    
+    # Create a new notebook with JSCL kernel
+    page.get_by_role("button", name=re.compile(r"Common Lisp \(JSCL\)")).first.click()
+    page.wait_for_timeout(3000)
+    
+    # Wait for the notebook to be ready
+    page.wait_for_selector('.jp-Notebook')
+    page.wait_for_timeout(2000)
+    
+    # Test list formatting - should be (1 2 3) not [1, 2, 3] or similar
+    cell = page.locator('.jp-Cell-inputArea .jp-CodeMirrorEditor')
+    cell.click()
+    page.keyboard.type("'(1 2 3)")
+    
+    # Execute the cell
+    page.keyboard.press('Shift+Enter')
+    
+    # Wait for output
+    page.wait_for_timeout(3000)
+    
+    # Check the output is formatted as a Lisp list
+    output = page.locator('.jp-OutputArea-output').last
+    output_text = output.inner_text()
+    # Should be Lisp-style (1 2 3), not JSON [1, 2, 3]
+    assert '(' in output_text and ')' in output_text, f"Output not formatted as Lisp list: {output_text}"
+    assert '[' not in output_text, f"Output appears to be JSON formatted: {output_text}"

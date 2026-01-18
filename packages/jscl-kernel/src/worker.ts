@@ -114,20 +114,30 @@ export class JSCLRemoteKernel {
 
       // Capture output during evaluation
       const originalWriteString = jscl.internals?.['%write-string'];
+      const capturedOutput: string[] = [];
 
-      // Set up output capture
+      // Set up output capture - collect output synchronously
       if (jscl.internals) {
         jscl.internals['%write-string'] = (str: string) => {
-          // Stream output immediately
-          postMessage({
-            type: 'stream',
-            bundle: { name: 'stdout', text: str }
-          });
+          capturedOutput.push(str);
         };
       }
 
-      // Evaluate the Common Lisp code
-      const result = jscl.evaluateString(code);
+      // First, evaluate the user's code to capture any output
+      const rawResult = jscl.evaluateString(code);
+
+      // Now format the result using prin1-to-string (this won't produce stdout)
+      // Store the raw result in a temp var so we can access it from Lisp
+      const tempVar = '__kernel_temp_result__';
+      (self as any)[tempVar] = rawResult;
+      let formattedResult: unknown;
+      try {
+        formattedResult = jscl.evaluateString(
+          `(prin1-to-string (jscl::oget (jscl::%js-vref "self") "${tempVar}"))`
+        );
+      } finally {
+        delete (self as any)[tempVar];
+      }
 
       // Restore original write function
       if (originalWriteString && jscl.internals) {
@@ -136,8 +146,30 @@ export class JSCLRemoteKernel {
 
       this._executionCount++;
 
-      // Format the result for display
-      const textPlain = this._formatResult(result);
+      // Send captured stdout FIRST, before the result
+      if (capturedOutput.length > 0) {
+        postMessage({
+          type: 'stream',
+          bundle: { name: 'stdout', text: capturedOutput.join('') }
+        });
+      }
+
+      // Result is already a formatted string from prin1-to-string
+      // Convert JSCL lisp string to JS string
+      let textPlain: string | undefined;
+      if (formattedResult !== undefined && formattedResult !== null) {
+        // Use lisp_to_js which handles JSCL strings (arrays with stringp=1)
+        // and other value conversions
+        const internals = jscl.internals as any;
+        if (internals?.lisp_to_js) {
+          textPlain = internals.lisp_to_js(formattedResult);
+        } else if (internals?.xstring && Array.isArray(formattedResult)) {
+          textPlain = internals.xstring(formattedResult);
+        } else {
+          textPlain = String(formattedResult);
+        }
+      }
+      
       const data: { ['text/plain']?: string } = {};
       if (
         typeof textPlain === 'string' &&
@@ -307,56 +339,5 @@ export class JSCLRemoteKernel {
       metadata: {},
       status: 'ok'
     };
-  }
-
-  /**
-   * Format a JSCL result for display.
-   */
-  private _formatResult(val: any): string | undefined {
-    if (val === undefined || val === null) {
-      return undefined;
-    }
-
-    // JSCL returns JavaScript values that represent Lisp objects
-    // Try to convert them to a readable string representation
-    try {
-      if (typeof val === 'string') {
-        return val;
-      }
-      if (typeof val === 'number' || typeof val === 'boolean') {
-        return String(val);
-      }
-      if (Array.isArray(val)) {
-        return this._formatList(val);
-      }
-      if (typeof val === 'object' && val !== null) {
-        // Check if it has a toString method that gives meaningful output
-        const str = String(val);
-        if (str !== '[object Object]') {
-          return str;
-        }
-        // Try to format as a Lisp object
-        return JSON.stringify(val);
-      }
-      return String(val);
-    } catch {
-      return String(val);
-    }
-  }
-
-  /**
-   * Format a list (array) as a Lisp list.
-   */
-  private _formatList(arr: any[]): string {
-    if (arr.length === 0) {
-      return 'NIL';
-    }
-    const items = arr.map(item => {
-      if (Array.isArray(item)) {
-        return this._formatList(item);
-      }
-      return String(item);
-    });
-    return '(' + items.join(' ') + ')';
   }
 }
